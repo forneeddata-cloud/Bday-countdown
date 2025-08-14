@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Countdown</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Righteous&family=Creepster&family=Bungee&family=Fredoka+One&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated galaxy background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 50%, transparent 20%, rgba(255, 20, 147, 0.3) 21%, rgba(255, 20, 147, 0.3) 25%, transparent 25.5%, transparent 27.5%, rgba(255, 20, 147, 0.3) 28%, rgba(255, 20, 147, 0.3) 32%, transparent 32.5%),
+                radial-gradient(ellipse at 80% 50%, transparent 20%, rgba(0, 255, 255, 0.3) 21%, rgba(0, 255, 255, 0.3) 25%, transparent 25.5%, transparent 27.5%, rgba(0, 255, 255, 0.3) 28%, rgba(0, 255, 255, 0.3) 32%, transparent 32.5%),
+                radial-gradient(ellipse at 40% 80%, transparent 20%, rgba(138, 43, 226, 0.4) 21%, rgba(138, 43, 226, 0.4) 25%, transparent 25.5%, transparent 27.5%, rgba(138, 43, 226, 0.4) 28%, rgba(138, 43, 226, 0.4) 32%, transparent 32.5%),
+                radial-gradient(ellipse at 60% 20%, transparent 20%, rgba(255, 165, 0, 0.4) 21%, rgba(255, 165, 0, 0.4) 25%, transparent 25.5%, transparent 27.5%, rgba(255, 165, 0, 0.4) 28%, rgba(255, 165, 0, 0.4) 32%, transparent 32.5%),
+                radial-gradient(circle at 50% 50%, #000428 0%, #004e92 100%);
+            animation: galaxyRotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes galaxyRotate {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* Floating neon shapes and stars */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: neonFloat 8s ease-in-out infinite;
+        }
+
+        .particle:nth-child(odd) {
+            background: radial-gradient(circle, #000000, #000000, transparent);
+            box-shadow: 0 0 20px #ff1493, 0 0 40px #ff1493, 0 0 60px #ff1493;
+        }
+
+        .particle:nth-child(even) {
+            background: radial-gradient(circle, #00ffff, #87ceeb, transparent);
+            box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff, 0 0 60px #00ffff;
+        }
+
+        .particle:nth-child(3n) {
+            background: radial-gradient(circle, #ffd700, #ffff00, transparent);
+            box-shadow: 0 0 20px #ffd700, 0 0 40px #ffd700, 0 0 60px #ffd700;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        @keyframes neonFloat {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg) scale(0.8); 
+                opacity: 0.7; 
+            }
+            25% { 
+                transform: translateY(-30px) rotate(90deg) scale(1.2); 
+                opacity: 1; 
+            }
+            50% { 
+                transform: translateY(-15px) rotate(180deg) scale(1); 
+                opacity: 0.9; 
+            }
+            75% { 
+                transform: translateY(-40px) rotate(270deg) scale(1.1); 
+                opacity: 0.8; 
+            }
+        }
+
+        /* Matrix-like digital rain effect */
+        .digital-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .rain-drop {
+            position: absolute;
+            color: #00ff41;
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            animation: rainFall 3s linear infinite;
+            text-shadow: 0 0 10px #00ff41;
+        }
+
+        @keyframes rainFall {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 
+                0 0 50px rgba(255, 20, 147, 0.4),
+                0 0 100px rgba(0, 255, 255, 0.3),
+                inset 0 0 50px rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 20, 147, 0.5);
+            animation: containerPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes containerPulse {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 50px rgba(255, 20, 147, 0.4),
+                    0 0 100px rgba(0, 255, 255, 0.3),
+                    inset 0 0 50px rgba(255, 255, 255, 0.1);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 80px rgba(255, 20, 147, 0.6),
+                    0 0 150px rgba(0, 255, 255, 0.5),
+                    inset 0 0 80px rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        .title {
+            font-family: 'Bungee', cursive;
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #ff1493, #00ffff, #ffd700, #ff6347, #9370db, #00ff7f);
+            background-size: 600% 600%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: psychedelicShift 2s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(255, 20, 147, 0.8);
+            filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.6));
+            transform: perspective(500px) rotateX(15deg);
+        }
+
+        @keyframes psychedelicShift {
+            0%, 100% { 
+                background-position: 0% 50%; 
+                transform: perspective(500px) rotateX(15deg) scale(1);
+            }
+            33% { 
+                background-position: 100% 50%; 
+                transform: perspective(500px) rotateX(10deg) scale(1.05);
+            }
+            66% { 
+                background-position: 50% 100%; 
+                transform: perspective(500px) rotateX(20deg) scale(0.98);
+            }
+        }
+
+        .subtitle {
+            font-family: 'Righteous', cursive;
+            font-size: 1.4rem;
+            margin-bottom: 40px;
+            color: #00ffff;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-shadow: 
+                0 0 10px #00ffff,
+                0 0 20px #00ffff,
+                0 0 30px #00ffff;
+            animation: glitch 3s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { 
+                transform: translateX(0);
+                text-shadow: 
+                    0 0 10px #00ffff,
+                    0 0 20px #00ffff,
+                    0 0 30px #00ffff;
+            }
+            10% { 
+                transform: translateX(-2px);
+                text-shadow: 
+                    2px 0 #ff1493,
+                    -2px 0 #00ffff,
+                    0 0 30px #00ffff;
+            }
+            20% { 
+                transform: translateX(2px);
+                text-shadow: 
+                    -2px 0 #ff1493,
+                    2px 0 #00ffff,
+                    0 0 30px #00ffff;
+            }
+            30% { transform: translateX(0); }
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .time-unit {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px 20px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+            transition: all 0.4s ease;
+            min-width: 120px;
+            transform: perspective(800px) rotateY(0deg);
+        }
+
+        .time-unit::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff1493, #00ffff, #ffd700, #ff6347);
+            background-size: 400% 400%;
+            border-radius: 22px;
+            z-index: -1;
+            animation: borderRainbow 3s ease-in-out infinite;
+        }
+
+        @keyframes borderRainbow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .time-unit:hover {
+            transform: perspective(800px) rotateY(15deg) translateY(-10px) scale(1.05);
+            box-shadow: 
+                0 20px 40px rgba(255, 20, 147, 0.4),
+                0 0 60px rgba(0, 255, 255, 0.3);
+        }
+
+        .time-number {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 3.5rem;
+            display: block;
+            color: #ffffff;
+            text-shadow: 
+                0 0 10px #000000,
+                0 0 20px #ffffff,
+                0 0 30px #ffffff,
+                0 0 40px #000000;
+            animation: numberGlow 2s ease-in-out infinite alternate;
+            background: linear-gradient(45deg, #ffffff, #ff1493, #00ffff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: numberShimmer 3s ease-in-out infinite, numberFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes numberGlow {
+            0% { 
+                filter: brightness(1) contrast(1); 
+                transform: scale(1);
+            }
+            100% { 
+                filter: brightness(1.3) contrast(1.2); 
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes numberShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes numberFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .time-label {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 8px;
+            color: #000000;
+            text-shadow: 
+                0 0 10px #00ffff,
+                0 0 20px #00ffff;
+            animation: labelPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes labelPulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .celebrate-btn {
+            font-family: 'Bungee', cursive;
+            background: linear-gradient(45deg, #ff1493, #ffd700, #00ffff, #ff6347);
+            background-size: 300% 300%;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #000;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 
+                0 8px 25px rgba(255, 20, 147, 0.4),
+                0 0 40px rgba(0, 255, 255, 0.3),
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            animation: buttonShimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes buttonShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .celebrate-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.6s ease;
+        }
+
+        .celebrate-btn:enabled {
+            animation: buttonShimmer 3s ease-in-out infinite, celebrationBounce 1s ease-in-out infinite;
+            text-shadow: 
+                0 0 10px #fff,
+                0 0 20px #fff,
+                0 0 30px #fff;
+        }
+
+        .celebrate-btn:enabled:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .celebrate-btn:disabled {
+            background: rgba(50, 50, 50, 0.8);
+            color: rgba(255, 255, 255, 0.4);
+            cursor: not-allowed;
+            opacity: 0.6;
+            animation: none;
+            box-shadow: none;
+            text-shadow: none;
+        }
+
+        .celebrate-btn:enabled:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 15px 40px rgba(255, 20, 147, 0.6),
+                0 0 60px rgba(0, 255, 255, 0.5),
+                inset 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes celebrationBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        .message {
+            font-family: 'Righteous', cursive;
+            margin-top: 25px;
+            font-size: 1.2rem;
+            color: #ffd700;
+            text-shadow: 
+                0 0 10px #ffd700,
+                0 0 20px #ffd700;
+            animation: messageFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes messageFloat {
+            0%, 100% { 
+                transform: translateY(0px);
+                opacity: 0.8;
+            }
+            50% { 
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+        }
+
+        /* Enhanced confetti animation */
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #ff6b6b;
+            animation: confetti-fall 4s linear infinite;
+        }
+
+        .confetti-piece:nth-child(odd) {
+            background: linear-gradient(45deg, #ff1493, #ffd700);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+
+        .confetti-piece:nth-child(even) {
+            background: linear-gradient(45deg, #00ffff, #9370db);
+            border-radius: 50%;
+        }
+
+        .confetti-piece:nth-child(3n) {
+            background: linear-gradient(45deg, #ff6347, #00ff7f);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotateZ(0deg) scale(0);
+                opacity: 1;
+            }
+            10% {
+                transform: translateY(-80vh) rotateZ(360deg) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotateZ(1080deg) scale(0);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .title { 
+                font-size: 2.5rem; 
+                margin-bottom: 10px;
+            }
+            .subtitle { font-size: 1.1rem; }
+            .time-number { font-size: 2.8rem; }
+            .countdown { gap: 15px; }
+            .time-unit { 
+                padding: 20px 15px; 
+                min-width: 100px; 
+            }
+            .container { 
+                padding: 35px 25px; 
+                margin: 15px; 
+            }
+            .celebrate-btn {
+                padding: 15px 35px;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title { font-size: 2rem; }
+            .time-number { font-size: 2.2rem; }
+            .time-unit { min-width: 85px; padding: 15px 10px; }
+            .celebrate-btn { padding: 12px 25px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <div class="digital-rain" id="digitalRain"></div>
+    
+    <div class="container">
+        <h1 class="title">🎉 Birthday Countdown 🎂</h1>
+        <p class="subtitle">TIME REMAINING</p>
+        
+        <div class="countdown" id="countdown">
+            <div class="time-unit">
+                <span class="time-number" id="days">00</span>
+                <span class="time-label">DAYS</span>
+            </div>
+            <div class="time-unit">
+                <span class="time-number" id="hours">00</span>
+                <span class="time-label">HOURS</span>
+            </div>
+            <div class="time-unit">
+                <span class="time-number" id="minutes">00</span>
+                <span class="time-label">MINUTES</span>
+            </div>
+            <div class="time-unit">
+                <span class="time-number" id="seconds">00</span>
+                <span class="time-label">SECONDS</span>
+            </div>
+        </div>
+        
+        <button class="celebrate-btn" id="celebrateBtn" disabled onclick="startCelebration()">
+            🎊 LET'S START CELEBRATE 🎊
+        </button>
+        
+        <p class="message" id="message">Get ready for the big day!</p>
+    </div>
+
+    <script>
+        // Set the target date to September 21, 2025 at midnight
+        const targetDate = new Date('2025-09-21T00:00:00').getTime();
+
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.width = Math.random() * 6 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Create confetti animation
+        function createConfetti() {
+            const confettiContainer = document.createElement('div');
+            confettiContainer.className = 'confetti';
+            document.body.appendChild(confettiContainer);
+
+            const colors = ['#ff6b6b', '#ffd93d', '#6bcf7f', '#4d9de0', '#ff8a80', '#ffd54f'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confettiPiece = document.createElement('div');
+                confettiPiece.className = 'confetti-piece';
+                confettiPiece.style.left = Math.random() * 100 + '%';
+                confettiPiece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confettiPiece.style.animationDelay = Math.random() * 3 + 's';
+                confettiContainer.appendChild(confettiPiece);
+            }
+
+            // Remove confetti after animation
+            setTimeout(() => {
+                confettiContainer.remove();
+            }, 3000);
+        }
+
+        // Update countdown timer
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                // Birthday has arrived!
+                document.getElementById('days').textContent = '00';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+                
+                document.getElementById('celebrateBtn').disabled = false;
+                document.getElementById('message').textContent = '🎉 Happy Birthday! Time to celebrate! 🎉';
+                
+                // Trigger confetti
+                createConfetti();
+                return;
+            }
+
+            // Calculate time units
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the countdown
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+
+        // Function to handle celebration button click
+        function startCelebration() {
+            // Redirect to a celebration website (you can change this URL)
+            window.open('link podanum ', '_blank');
+            
+            // Create more confetti for the celebration
+            createConfetti();
+            setTimeout(createConfetti, 500);
+            setTimeout(createConfetti, 1000);
+        }
+
+        // Initialize
+        createParticles();
+        updateCountdown();
+        
+        // Update every second
+        const countdownInterval = setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
